@@ -1,0 +1,124 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}Manage Appointments | MedPulse{% endblock %}
+
+{% block content %}
+<div class="page-title-block">
+    <div>
+        <h1 class="page-title">Appointments</h1>
+        <div class="page-subtitle">Schedule, update, and manage all patient consultations.</div>
+    </div>
+    <div>
+        <a href="{% url 'appointment_book' %}" class="btn-primary">
+            <i class="fa-solid fa-calendar-plus"></i>
+            <span>Book Appointment</span>
+        </a>
+    </div>
+</div>
+
+<!-- Status Filters -->
+<div class="filter-container">
+    <a href="{% url 'appointment_list' %}" class="filter-btn {% if not status_filter %}active{% endif %}">All</a>
+    <a href="{% url 'appointment_list' %}?status=Scheduled" class="filter-btn {% if status_filter == 'Scheduled' %}active{% endif %}">Scheduled</a>
+    <a href="{% url 'appointment_list' %}?status=Confirmed" class="filter-btn {% if status_filter == 'Confirmed' %}active{% endif %}">Confirmed</a>
+    <a href="{% url 'appointment_list' %}?status=Completed" class="filter-btn {% if status_filter == 'Completed' %}active{% endif %}">Completed</a>
+    <a href="{% url 'appointment_list' %}?status=Cancelled" class="filter-btn {% if status_filter == 'Cancelled' %}active{% endif %}">Cancelled</a>
+</div>
+
+<!-- Appointments Table Card -->
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        {% if appointments %}
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date & Time</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in appointments %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'patient_detail' app.patient.pk %}" style="font-weight: 600; text-decoration: none; color: var(--accent-blue);">
+                                        {{ app.patient.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'doctor_detail' app.doctor.pk %}" style="text-decoration: none; color: var(--text-primary); font-weight: 500;">
+                                        Dr. {{ app.doctor.name }}
+                                    </a>
+                                    <div style="font-size: 11px; color: var(--text-muted);">{{ app.doctor.specialization }}</div>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 500;">{{ app.appointment_date }}</div>
+                                    <div style="font-size: 12px; color: var(--text-muted);">{{ app.appointment_time|time:"H:i" }}</div>
+                                </td>
+                                <td>
+                                    <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ app.reason }}">
+                                        {{ app.reason }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {% if app.status == 'Scheduled' %}badge-scheduled{% elif app.status == 'Confirmed' %}badge-confirmed{% elif app.status == 'Completed' %}badge-completed{% else %}badge-cancelled{% endif %}">
+                                        {{ app.status }}
+                                    </span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <div style="display: inline-flex; gap: 8px; justify-content: flex-end;">
+                                        {% if app.status == 'Scheduled' %}
+                                            <form action="{% url 'appointment_update_status' app.pk %}" method="POST" style="margin: 0;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="status" value="Confirmed">
+                                                <button type="submit" class="btn-secondary" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; color: var(--accent-purple); border-color: rgba(139, 92, 246, 0.2);" title="Confirm Appointment">
+                                                    <i class="fa-solid fa-check"></i> Confirm
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        
+                                        {% if app.status == 'Scheduled' or app.status == 'Confirmed' %}
+                                            <form action="{% url 'appointment_update_status' app.pk %}" method="POST" style="margin: 0;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="status" value="Completed">
+                                                <button type="submit" class="btn-secondary" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; color: var(--success); border-color: rgba(16, 185, 129, 0.2);" title="Complete Appointment">
+                                                    <i class="fa-solid fa-circle-check"></i> Complete
+                                                </button>
+                                            </form>
+                                            
+                                            <form action="{% url 'appointment_update_status' app.pk %}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="status" value="Cancelled">
+                                                <button type="submit" class="btn-secondary" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; color: var(--danger); border-color: rgba(239, 68, 68, 0.2);" title="Cancel Appointment">
+                                                    <i class="fa-solid fa-xmark"></i> Cancel
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        
+                                        {% if app.status == 'Completed' %}
+                                            <a href="{% url 'patient_detail' app.patient.pk %}" class="btn-secondary" style="padding: 6px 10px; font-size: 12px; border-radius: 6px; color: var(--accent-teal);" title="Add Medical Record">
+                                                <i class="fa-solid fa-file-medical"></i> Add Record
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="padding: 48px; text-align: center;">
+                <i class="fa-solid fa-calendar-times" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px; display: block;"></i>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">No appointments found</h3>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">There are no appointments registered in this view.</p>
+                <a href="{% url 'appointment_book' %}" class="btn-primary">Book an Appointment Now</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

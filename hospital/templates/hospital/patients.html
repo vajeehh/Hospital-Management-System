@@ -1,0 +1,100 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}Patients Directory | MedPulse{% endblock %}
+
+{% block content %}
+<div class="page-title-block">
+    <div>
+        <h1 class="page-title">Patients Directory</h1>
+        <div class="page-subtitle">Manage medical directory records and register new clinical profiles.</div>
+    </div>
+    <div>
+        <a href="{% url 'patient_add' %}" class="btn-primary">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Register Patient</span>
+        </a>
+    </div>
+</div>
+
+<!-- Search Query Header Display -->
+{% if query %}
+    <div style="margin-bottom: 20px; font-weight: 500; font-size: 15px; color: var(--text-secondary);">
+        Found {{ patients|length }} results for search: <span style="color: var(--accent-blue);">"{{ query }}"</span>
+        <a href="{% url 'patient_list' %}" style="margin-left: 10px; text-decoration: none; color: var(--text-muted); font-size: 13px;"><i class="fa-solid fa-circle-xmark"></i> Clear Search</a>
+    </div>
+{% endif %}
+
+<!-- Patients Table Card -->
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        {% if patients %}
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Patient Name</th>
+                            <th>Contact Info</th>
+                            <th>DOB / Age</th>
+                            <th>Gender</th>
+                            <th>Blood Group</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pat in patients %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'patient_detail' pat.pk %}" style="font-weight: 700; text-decoration: none; color: var(--text-primary); font-size: 15px;">
+                                        {{ pat.name }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 500;"><i class="fa-solid fa-phone" style="font-size: 11px; color: var(--text-muted); margin-right: 4px;"></i> {{ pat.phone }}</div>
+                                    {% if pat.email %}
+                                        <div style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-envelope" style="font-size: 11px; color: var(--text-muted); margin-right: 4px;"></i> {{ pat.email }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div>{{ pat.date_of_birth }}</div>
+                                </td>
+                                <td>
+                                    <span style="font-weight: 500;">{{ pat.gender }}</span>
+                                </td>
+                                <td>
+                                    {% if pat.blood_group %}
+                                        <span class="badge" style="background-color: var(--bg-primary); border: 1px solid var(--border-color); color: var(--danger); font-size: 12px; font-weight: 700;">
+                                            <i class="fa-solid fa-droplet" style="font-size: 10px;"></i> {{ pat.blood_group }}
+                                        </span>
+                                    {% else %}
+                                        <span style="color: var(--text-muted); font-size: 13px;">—</span>
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: right;">
+                                    <div style="display: inline-flex; gap: 8px;">
+                                        <a href="{% url 'patient_detail' pat.pk %}" class="btn-secondary" style="padding: 8px 12px; font-size: 13px;">
+                                            <i class="fa-solid fa-folder-open"></i> File Details
+                                        </a>
+                                        <a href="{% url 'appointment_book' %}?patient={{ pat.pk }}" class="btn-secondary" style="padding: 8px 12px; font-size: 13px; color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.2);">
+                                            <i class="fa-solid fa-calendar-plus"></i> Book
+                                        </a>
+                                        <a href="{% url 'patient_edit' pat.pk %}" class="btn-secondary" style="padding: 8px 12px; font-size: 13px;" title="Edit Profile">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="padding: 48px; text-align: center;">
+                <i class="fa-solid fa-users-slash" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px; display: block;"></i>
+                <h3 style="font-size: 18px; margin-bottom: 8px;">No patients found</h3>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 24px;">There are no patients matching the search parameters in the database.</p>
+                <a href="{% url 'patient_add' %}" class="btn-primary">Register New Patient</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

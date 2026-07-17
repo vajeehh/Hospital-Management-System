@@ -1,0 +1,76 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}Doctors Directory | MedPulse{% endblock %}
+
+{% block content %}
+<div class="page-title-block">
+    <div>
+        <h1 class="page-title">Doctors Directory</h1>
+        <div class="page-subtitle">Browse profile details and clinic hours of our specialist practitioners.</div>
+    </div>
+</div>
+
+<!-- Department Filters -->
+<div class="filter-container">
+    <a href="{% url 'doctor_list' %}" class="filter-btn {% if not selected_dept %}active{% endif %}">All Departments</a>
+    {% for dept in departments %}
+        <a href="{% url 'doctor_list' %}?department={{ dept.id }}" class="filter-btn {% if selected_dept.id == dept.id %}active{% endif %}">
+            {{ dept.name }}
+        </a>
+    {% endfor %}
+</div>
+
+<!-- Doctors Grid -->
+{% if doctors %}
+    <div class="doctors-grid">
+        {% for doc in doctors %}
+            <div class="doctor-card">
+                <div class="doctor-avatar-container">
+                    <!-- Custom icons based on department for a premium vibe -->
+                    {% if doc.department.name == 'Cardiology' %}
+                        <i class="fa-solid fa-heart-circle-check" style="color: var(--danger);"></i>
+                    {% elif doc.department.name == 'Neurology' %}
+                        <i class="fa-solid fa-brain" style="color: var(--accent-purple);"></i>
+                    {% elif doc.department.name == 'Pediatrics' %}
+                        <i class="fa-solid fa-baby" style="color: var(--accent-teal);"></i>
+                    {% elif doc.department.name == 'Orthopedics' %}
+                        <i class="fa-solid fa-bone" style="color: var(--warning);"></i>
+                    {% else %}
+                        <i class="fa-solid fa-user-doctor"></i>
+                    {% endif %}
+                </div>
+                
+                <h3 class="doctor-name">Dr. {{ doc.name }}</h3>
+                <span class="doctor-spec">{{ doc.specialization }}</span>
+                <div class="doctor-dept">
+                    <i class="fa-solid fa-building-user"></i> {{ doc.department.name }}
+                </div>
+                
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fa-solid fa-door-open" style="color: var(--text-muted);"></i> Room {{ doc.room_number }}
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: var(--text-secondary); text-align: left; padding: 12px; background-color: var(--bg-primary); border-radius: 8px; margin-bottom: 20px;">
+                    <div><i class="fa-solid fa-clock" style="width: 16px; color: var(--accent-blue);"></i> {{ doc.availability }}</div>
+                    <div><i class="fa-solid fa-phone" style="width: 16px; color: var(--accent-blue);"></i> {{ doc.phone }}</div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <a href="{% url 'doctor_detail' doc.pk %}" class="btn-secondary" style="flex: 1; padding: 10px; font-size: 13px; justify-content: center;">
+                        Profile
+                    </a>
+                    <a href="{% url 'appointment_book' %}?doctor={{ doc.pk }}" class="btn-primary" style="flex: 1; padding: 10px; font-size: 13px; justify-content: center;">
+                        <i class="fa-solid fa-calendar-plus" style="font-size: 12px;"></i> Book
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="padding: 48px; text-align: center;">
+        <i class="fa-solid fa-user-slash" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+        <h3>No doctors found</h3>
+        <p style="color: var(--text-muted); margin-top: 8px;">There are no doctors registered in the selected department.</p>
+    </div>
+{% endif %}
+{% endblock %}

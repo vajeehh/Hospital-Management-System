@@ -1,0 +1,124 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}Dr. {{ doctor.name }} | MedPulse{% endblock %}
+
+{% block content %}
+<div class="page-title-block">
+    <div>
+        <h1 class="page-title">Doctor Profile</h1>
+        <div class="page-subtitle">Detailed clinical background and availability details.</div>
+    </div>
+    <div>
+        <a href="{% url 'doctor_list' %}" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Directory</span>
+        </a>
+    </div>
+</div>
+
+<div class="patient-profile-layout" style="grid-template-columns: 1fr 2fr;">
+    <!-- Doctor Summary Sidebar -->
+    <div class="patient-info-sidebar" style="position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 8px; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));"></div>
+        
+        <div class="patient-avatar-large" style="background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));">
+            <i class="fa-solid fa-user-doctor" style="font-size: 42px;"></i>
+        </div>
+        
+        <h2 class="patient-name-large">Dr. {{ doctor.name }}</h2>
+        <span class="doctor-spec" style="margin-bottom: 20px;">{{ doctor.specialization }}</span>
+        
+        <div class="patient-meta-list">
+            <div class="patient-meta-row">
+                <span class="patient-meta-label">Department</span>
+                <span class="patient-meta-value">{{ doctor.department.name }}</span>
+            </div>
+            <div class="patient-meta-row">
+                <span class="patient-meta-label">Room Number</span>
+                <span class="patient-meta-value">Room {{ doctor.room_number }}</span>
+            </div>
+            <div class="patient-meta-row">
+                <span class="patient-meta-label">Phone</span>
+                <span class="patient-meta-value">{{ doctor.phone }}</span>
+            </div>
+            <div class="patient-meta-row">
+                <span class="patient-meta-label">Email</span>
+                <span class="patient-meta-value" style="font-size: 12px; word-break: break-all;">{{ doctor.email }}</span>
+            </div>
+            <div class="patient-meta-row" style="flex-direction: column; gap: 6px; align-items: flex-start; border-bottom: none;">
+                <span class="patient-meta-label">Availability</span>
+                <span class="patient-meta-value" style="font-size: 13px; color: var(--accent-blue);">
+                    <i class="fa-solid fa-calendar-days"></i> {{ doctor.availability }}
+                </span>
+            </div>
+        </div>
+
+        <a href="{% url 'appointment_book' %}?doctor={{ doctor.pk }}" class="btn-primary" style="width: 100%; margin-top: 24px; justify-content: center;">
+            <i class="fa-solid fa-calendar-plus"></i> Schedule Appointment
+        </a>
+    </div>
+
+    <!-- Doctor Details and Appointments Timeline -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Bio Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Professional Biography</h3>
+            </div>
+            <div class="card-body">
+                <p style="font-size: 15px; line-height: 1.6; color: var(--text-secondary);">
+                    {{ doctor.bio|default:"No professional biography has been provided yet for this practitioner." }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Recent Appointments Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Recent and Scheduled Appointments</h3>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                {% if appointments %}
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Date & Time</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in appointments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'patient_detail' app.patient.pk %}" style="font-weight: 600; text-decoration: none; color: var(--accent-blue);">
+                                            {{ app.patient.name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div>{{ app.appointment_date }}</div>
+                                        <div style="font-size: 12px; color: var(--text-muted);">{{ app.appointment_time|time:"H:i" }}</div>
+                                    </td>
+                                    <td>
+                                        <div style="max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ app.reason }}">
+                                            {{ app.reason }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if app.status == 'Scheduled' %}badge-scheduled{% elif app.status == 'Confirmed' %}badge-confirmed{% elif app.status == 'Completed' %}badge-completed{% else %}badge-cancelled{% endif %}">
+                                            {{ app.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p style="padding: 24px; color: var(--text-muted); font-size: 14px; text-align: center;">No registered appointments for this doctor.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

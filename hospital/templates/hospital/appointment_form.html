@@ -1,0 +1,87 @@
+{% extends 'hospital/base.html' %}
+
+{% block title %}Book Appointment | MedPulse{% endblock %}
+
+{% block content %}
+<div class="page-title-block">
+    <div>
+        <h1 class="page-title">Book Appointment</h1>
+        <div class="page-subtitle">Register a new medical consultation slot.</div>
+    </div>
+    <div>
+        <a href="{% url 'appointment_list' %}" class="btn-secondary">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to List</span>
+        </a>
+    </div>
+</div>
+
+<div class="form-card">
+    <form method="POST" action="">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div style="background-color: var(--danger-light); color: var(--danger); padding: 12px 16px; border-radius: var(--border-radius); margin-bottom: 20px; font-size: 14px;">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label class="form-label" for="{{ form.patient.id_for_label }}">Select Patient</label>
+            {{ form.patient }}
+            {% if form.patient.errors %}
+                <span style="color: var(--danger); font-size: 12px; margin-top: 4px; display: block;">{{ form.patient.errors.0 }}</span>
+            {% endif %}
+            <div style="margin-top: 6px;">
+                <span style="font-size: 12px; color: var(--text-muted);">Patient not in database?</span>
+                <a href="{% url 'patient_add' %}" style="font-size: 12px; text-decoration: none; color: var(--accent-blue); font-weight: 600; margin-left: 4px;">
+                    <i class="fa-solid fa-user-plus"></i> Add New Patient
+                </a>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.doctor.id_for_label }}">Select Doctor</label>
+            {{ form.doctor }}
+            {% if form.doctor.errors %}
+                <span style="color: var(--danger); font-size: 12px; margin-top: 4px; display: block;">{{ form.doctor.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+                <label class="form-label" for="{{ form.appointment_date.id_for_label }}">Date</label>
+                {{ form.appointment_date }}
+                {% if form.appointment_date.errors %}
+                    <span style="color: var(--danger); font-size: 12px; margin-top: 4px; display: block;">{{ form.appointment_date.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.appointment_time.id_for_label }}">Time</label>
+                {{ form.appointment_time }}
+                {% if form.appointment_time.errors %}
+                    <span style="color: var(--danger); font-size: 12px; margin-top: 4px; display: block;">{{ form.appointment_time.errors.0 }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="{{ form.reason.id_for_label }}">Reason for Visit</label>
+            {{ form.reason }}
+            {% if form.reason.errors %}
+                <span style="color: var(--danger); font-size: 12px; margin-top: 4px; display: block;">{{ form.reason.errors.0 }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'appointment_list' %}" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary">
+                <i class="fa-solid fa-save"></i> Book Appointment
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

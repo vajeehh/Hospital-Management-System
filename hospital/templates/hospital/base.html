@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hospital Management System{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style System -->
+    <link rel="stylesheet" href="{% static 'hospital/css/styles.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-hospital-user"></i>
+                <span>MedPulse</span>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="{% url 'dashboard' %}" class="sidebar-link {% if active_tab == 'dashboard' %}active{% endif %}">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'appointment_list' %}" class="sidebar-link {% if active_tab == 'appointments' %}active{% endif %}">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Appointments</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'doctor_list' %}" class="sidebar-link {% if active_tab == 'doctors' %}active{% endif %}">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        <span>Doctors</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'patient_list' %}" class="sidebar-link {% if active_tab == 'patients' %}active{% endif %}">
+                        <i class="fa-solid fa-hospital-setter"></i>
+                        <span>Patients</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button id="theme-toggle-btn" class="theme-toggle-btn">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>Dark Mode</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header bar -->
+            <header class="content-header">
+                <div class="search-bar-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Search patients..." class="search-input" name="q" value="{{ query|default:'' }}">
+                </div>
+                
+                <div class="header-actions">
+                    <div class="header-user">
+                        <div class="user-avatar">
+                            AD
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">Admin Staff</div>
+                            <div class="user-role">Administrator</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main view container -->
+            <div class="content-body">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Script assets -->
+    <script src="{% static 'hospital/js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
